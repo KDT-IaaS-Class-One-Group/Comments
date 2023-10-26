@@ -43,3 +43,6 @@ app.post('/upload', (req, res) => {
 app.listen(port, () => {
   console.log(`서버가 ${port} 포트에서 실행 중입니다.`);
 });
+
+
+이거 안돌아가는디? 뭐 깔아줘야함?
