@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>업로드된 이미지</h1>
+  <div id="image-container">
+      <img id="uploadedImage" src="" alt="Uploaded Image">
+  </div>
+  <script>
+      // 서버에서 이미지 파일 이름을 받아와서 이미지 표시
+      fetch('/get-image')
+          .then(response => response.text())
+          .then(imageName => {
+              const uploadedImage = document.getElementById('uploadedImage');
+              if (imageName) {
+                  // 이미지 파일이 있는 경우 이미지 표시
+                  uploadedImage.src = `/uploads/${imageName}`;
+              } else {
+                  // 이미지 파일이 없는 경우 대체 텍스트를 표시하거나 다른 처리를 수행할 수 있음
+                  uploadedImage.alt = '이미지가 없습니다.';
+              }
+          })
+          .catch(error => {
+              console.error('이미지 가져오기 실패:', error);
+          });
+    </script>
+</body>
+</html>
