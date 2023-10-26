@@ -2,32 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Sub Page</title>
 </head>
 <body>
   <h1>업로드된 이미지</h1>
-  <div id="image-container">
-      <img id="uploadedImage" src="" alt="Uploaded Image">
-  </div>
-  <script>
-      // 서버에서 이미지 파일 이름을 받아와서 이미지 표시
-      fetch('/get-image')
-          .then(response => response.text())
-          .then(imageName => {
-              const uploadedImage = document.getElementById('uploadedImage');
-              if (imageName) {
-                  // 이미지 파일이 있는 경우 이미지 표시
-                  uploadedImage.src = `/uploads/${imageName}`;
-              } else {
-                  // 이미지 파일이 없는 경우 대체 텍스트를 표시하거나 다른 처리를 수행할 수 있음
-                  uploadedImage.alt = '이미지가 없습니다.';
-              }
-          })
-          .catch(error => {
-              console.error('이미지 가져오기 실패:', error);
-          });
+    <div id="image-container">
+        <!-- 이미지를 표시할 div를 동적으로 생성하기 위한 컨테이너 -->
+    </div>
+    <script>
+        // 서버에서 이미 저장된 이미지 파일 목록을 받아옴
+        fetch('/get-image')
+            .then(response => response.json()) // JSON 형식의 응답을 파싱
+            .then(imageNames => {
+                const imageContainer = document.getElementById('image-container');
+                if (imageNames.length > 0) {
+                    imageNames.forEach(imageName => {
+                        const imageDiv = document.createElement('div');
+                        const img = document.createElement('img');
+                        
+                        // 이미지 파일의 경로를 설정
+                        img.src = `/uploads/${imageName}`;
+                        img.alt = 'Uploaded Image';
+                        
+                        imageDiv.appendChild(img);
+                        imageContainer.appendChild(imageDiv);
+                    });
+                } else {
+                    // 이미지 파일이 없는 경우에 대체 텍스트를 표시하거나 다른 처리를 수행할 수 있음
+                    imageContainer.innerHTML = '<p>이미지가 없습니다.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('이미지 가져오기 실패:', error);
+            });
     </script>
 </body>
 </html>

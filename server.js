@@ -1,20 +1,23 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const path = require('path');
+const fs = require('fs');
 const app = express();
-const port = 5000; // 사용할 포트 번호
+const port = 3000;
 
 app.use(fileUpload());
-app.use(express.static(__dirname)); // 정적 파일을 서비스하도록 설정
+app.use(express.static(__dirname));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html')); // index.html 페이지 반환
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/sub', (req, res) => {
-  res.sendFile(path.join(__dirname, 'sub.html')); // sub.html 페이지 반환
+  res.sendFile(path.join(__dirname, 'sub.html'));
 });
 
+let uploadCounter = 0;
 
 app.post('/upload', (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -22,23 +25,24 @@ app.post('/upload', (req, res) => {
   }
 
   const uploadedFile = req.files.image;
-  const uploadPath = path.join(__dirname, 'uploads', uploadedFile.name);
 
-  app.get('/get-image', (req, res) => {
-    // 이미지 파일 이름을 클라이언트로 전송
-    res.send(uploadedFile ? uploadedFile.name : '');
-  });
-  
+  const newFileName = `image${++uploadCounter}.jpg`;
+
+  const uploadPath = path.join(__dirname, 'uploads', newFileName);
+
   uploadedFile.mv(uploadPath, (err) => {
     if (err) {
       return res.status(500).send('파일 업로드에 실패했습니다.');
     }
 
-    // 이미지 파일 이름을 클라이언트로 전송
-    res.sendFile(path.join(__dirname, 'sub.html'));
+    res.redirect('/sub');
   });
 });
 
+app.get('/get-image', (req, res) => {
+  const filesInUploads = fs.readdirSync(path.join(__dirname, 'uploads'));
+  res.json(filesInUploads); // 이미지 파일 이름 목록을 JSON 형식으로 전달
+});
 
 app.listen(port, () => {
   console.log(`서버가 ${port} 포트에서 실행 중입니다.`);
