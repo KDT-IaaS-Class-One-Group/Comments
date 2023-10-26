@@ -1,20 +1,20 @@
-// 이미지를 표시할 요소 가져오기
-const imageContainer = document.getElementById("image-container");
-
-// 서버에서 이미지 목록을 가져오는 요청을 보낼 URL 설정
-const imageUrl = "/getImages"; // 이미지 목록을 제공하는 백엔드 엔드포인트
-
-// 서버에서 이미지 목록을 가져오는 요청 보내기
-fetch(imageUrl)
+// 서버로부터 데이터를 가져와 이미지와 텍스트를 표시하는 함수 호출
+fetch("/data")
   .then((response) => response.json())
   .then((data) => {
-    // 이미지 목록을 반복하며 이미지를 표시
-    data.forEach((imageName) => {
-      const imageElement = document.createElement("img");
-      imageElement.src = `uploads/${imageName}`; // 이미지 파일 경로 설정
-      imageContainer.appendChild(imageElement);
+    const dataContainer = document.getElementById("data-container");
+
+    data.forEach((item) => {
+      const dataDiv = document.createElement("div");
+      const image = document.createElement("img");
+      image.src = item.imagePath;
+      const text = document.createElement("p");
+      text.textContent = item.text;
+      dataDiv.appendChild(image);
+      dataDiv.appendChild(text);
+      dataContainer.appendChild(dataDiv);
     });
   })
   .catch((error) => {
-    console.error("이미지 불러오기 실패: ", error);
+    console.error("데이터 가져오기 실패: ", error);
   });

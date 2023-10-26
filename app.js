@@ -19,35 +19,27 @@ const upload = multer({ storage });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// 이미지와 텍스트 데이터를 저장할 JavaScript 객체
-const data = {
-  images: [],
-  text: [],
-};
+// 이미지와 텍스트 데이터를 저장할 배열
+const data = [];
 
-// 이미지 업로드 엔드포인트 설정
-app.post("/upload-image", upload.single("image"), (req, res) => {
-  // 이미지 업로드 후 data 객체에 이미지 정보 추가
-  const imageInfo = {
-    filename: req.file.originalname,
-    path: req.file.path,
+// 이미지 업로드 및 데이터 추가 엔드포인트 설정
+app.post("/submit", upload.single("image"), (req, res) => {
+  // 이미지 업로드 후 data 배열에 이미지 정보와 텍스트 추가
+  const item = {
+    imagePath: req.file.path,
+    text: req.body.text,
   };
-  data.images.push(imageInfo);
-  res.status(200).send("이미지 업로드 완료");
+  data.push(item);
+  res.status(200).send("이미지 업로드 및 데이터 추가 완료");
 });
 
-// 텍스트 데이터 엔드포인트 설정
-app.post("/upload-text", (req, res) => {
-  // POST 요청의 텍스트 데이터를 data 객체에 추가
-  const textData = req.body.text;
-  data.text.push(textData);
-  res.status(200).send("텍스트 데이터 업로드 완료");
-});
-
-// 이미지와 텍스트 데이터를 반환하는 엔드포인트 설정
+// 서버에서 데이터 배열을 반환하는 엔드포인트 설정
 app.get("/data", (req, res) => {
   res.json(data);
 });
+
+// 서브페이지 서비스 (public 폴더 내에 subindex.html 파일 있어야 함)
+app.use(express.static("public"));
 
 // 서버 시작
 app.listen(3000, () => {
