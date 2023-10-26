@@ -9,8 +9,29 @@
 <body>
   <form action="/upload" method="POST" enctype="multipart/form-data">
     <input type="file" name="image" accept="image/*">
-    <input type="text" name="text" >
+    <input type="text" name="text" id="textInput">
+    <div id="text-container"></div>
     <input type="submit" value="Upload Image">
   </form>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const textInput = document.getElementById("textInput");
+      const textContainer = document.getElementById("text-container");
+      let counter = 1;
+
+      textInput.addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+          const text = textInput.value;
+          const newDiv = document.createElement("div");
+          newDiv.id = "text" + counter;
+          newDiv.textContent = text;
+          textContainer.appendChild(newDiv);
+          textInput.value = "";
+          counter++;
+        }
+      });
+    });
+  </script>
 </body>
 </html>
