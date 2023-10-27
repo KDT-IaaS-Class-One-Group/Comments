@@ -51,7 +51,7 @@
     <input type="submit" value="Upload Image">
     </div>
   </form>
-  <script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.0/socket.io.js">
     const imageInput = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
     console.dir(imageInput)
@@ -71,6 +71,23 @@
         imagePreview.style.display = 'none';
       }
     });
+
+    const socket = io();
+    const messages = document.getElementById('messages');
+    const input = document.getElementById('input');
+
+    document.querySelector('button').addEventListener('click', () => {
+      socket.emit('message', input.value);
+      input.value = '';
+    });
+
+    socket.on('message', (message) => {
+      const li = document.createElement('li');
+      li.textContent = message;
+      messages.appendChild(li);
+    });
+
+
   </script>
 </body>
 </html>
