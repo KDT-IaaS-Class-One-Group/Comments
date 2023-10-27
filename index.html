@@ -42,58 +42,60 @@
 </head>
 <body>
   <form action="/upload" method="POST" enctype="multipart/form-data">
-<<<<<<< HEAD
-    <input type="file" name="image" accept="image/*">
-
-    <input type="text" name="text">
-=======
     <div id="root">
     <div id="song">
     <img src="" alt="Image Preview" id="imagePreview" style="display: none; max-width: 30vw; max-height: 60vh;">
     <input type="file" name="image" accept="image/*" id="imageInput">
     </div>
+
     <input id=sin type="text" name="text" >
->>>>>>> a9b6127
+    <div id="chat">
+      <ul id="input" autocomplete="off">
+        <li>
+        <input id="button" type="button" value ="전송">
+      </li>
+      </ul>
+    </div>
+
+
     <input type="submit" value="Upload Image">
+
+
+
     </div>
   </form>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.0/socket.io.js">
-    const imageInput = document.getElementById('imageInput');
-    const imagePreview = document.getElementById('imagePreview');
-    console.dir(imageInput)
-    imageInput.addEventListener('change', function() {
-      const file = imageInput.files[0];
-      if (file) {
-        const reader = new FileReader();
+   const imageInput = document.getElementById('imageInput');
+const imagePreview = document.getElementById('imagePreview');
+const textInput = document.getElementById('sin');
+const button = document.getElementById('button'); // "전송" 버튼 요소
 
-        reader.onload = function(e) {
-          imagePreview.src = e.target.result;
-          imagePreview.style.display = 'block';
-        };
+imageInput.addEventListener('change', function() {
+  const file = imageInput.files[0];
+  if (file) {
+    const reader = new FileReader();
 
-        reader.readAsDataURL(file);
-      } else {
-        imagePreview.src = '';
-        imagePreview.style.display = 'none';
-      }
-    });
+    reader.onload = function(e) {
+      imagePreview.src = e.target.result;
+      imagePreview.style.display = 'block';
+    };
 
-    const socket = io();
-    const messages = document.getElementById('messages');
-    const input = document.getElementById('input');
+    reader.readAsDataURL(file);
+  } else {
+    imagePreview.src = '';
+    imagePreview.style.display = 'none';
+  }
+});
 
-    document.querySelector('button').addEventListener('click', () => {
-      socket.emit('message', input.value);
-      input.value = '';
-    });
+const socket = io();
+const messages = document.getElementById('messages');
 
-    socket.on('message', (message) => {
-      const li = document.createElement('li');
-      li.textContent = message;
-      messages.appendChild(li);
-    });
-
-
+// "전송" 버튼 클릭 시 텍스트를 서버로 전송
+button.addEventListener('click', () => {
+  const message = textInput.value;
+  socket.emit('message', message);
+  textInput.value = ''; // 입력 필드를 초기화
+});
   </script>
 </body>
 </html>
