@@ -5,72 +5,44 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <style>
-  *{
-    margin:0;
-    padding:0;
-    box-sizing: border-box;
-  }
-  #root{
-    width:100vw;
-    height:100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  #song{
-    width:35vw;
-    height:80vh;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-  }
-  #imagePreview{
-    width:30vw;
-    height:60vh;
-  }
-  #imageInput{
-    width:10vw;
-    height:15vh
-  }
-  #sin{
-    width:35vw;
-    height:80vh;
-  }
-  </style>
 </head>
 <body>
+  <h1>파일 업로드 페이지</h1>
   <form action="/upload" method="POST" enctype="multipart/form-data">
-    <div id="root">
-    <div id="song">
-    <img src="" alt="Image Preview" id="imagePreview" style="display: none; max-width: 30vw; max-height: 60vh;">
-    <input type="file" name="image" accept="image/*" id="imageInput">
-    </div>
-    <input id=sin type="text" name="text" >
-    <input type="submit" value="Upload Image">
-    </div>
+    <label for="image">이미지 업로드:</label>
+    <input type="file" name="image" accept="image/*" id="imageInput" onchange="previewImage()"><br>
+    <label for="textFile">텍스트 파일 업로드:</label>
+    <input type="file" name="textFile" accept=".txt"><br>
+    <label for="text">텍스트 입력:</label>
+    <textarea name="text" rows="4" cols="50"></textarea><br>
+    <input type="submit" value="업로드">
   </form>
+  <div id="imagePreview" style="display: none;">
+    <h2>미리보기:</h2>
+    <img id="previewImage" style="max-width: 300px;">
+  </div>
+  <a href="/sub">서브 페이지로 이동</a>
   <script>
-    const imageInput = document.getElementById('imageInput');
-    const imagePreview = document.getElementById('imagePreview');
-    console.dir(imageInput)
-    imageInput.addEventListener('change', function() {
-      const file = imageInput.files[0];
-      if (file) {
+    // 이미지 업로드 입력란의 변경 이벤트를 처리하여 이미지 미리보기를 업데이트하는 JavaScript 코드
+    function previewImage() {
+      const imageInput = document.getElementById('imageInput');
+      const imagePreview = document.getElementById('imagePreview');
+      const previewImage = document.getElementById('previewImage');
+
+      if (imageInput.files && imageInput.files[0]) {
         const reader = new FileReader();
 
         reader.onload = function(e) {
-          imagePreview.src = e.target.result;
-          imagePreview.style.display = 'block';
+          previewImage.src = e.target.result;
         };
 
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(imageInput.files[0]);
+        imagePreview.style.display = 'block';
       } else {
-        imagePreview.src = '';
         imagePreview.style.display = 'none';
       }
-    });
+    }
   </script>
+
 </body>
 </html>

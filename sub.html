@@ -2,40 +2,70 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sub Page</title>
+  <title>Document</title>
+  <style>
+    .image-box {
+      display: inline-block;
+      margin: 10px;
+      border: 1px solid #000;
+      padding: 5px;
+    }
+  </style>
 </head>
 <body>
-  <h1>업로드된 이미지</h1>
-    <div id="image-container">
-        <!-- 이미지를 표시할 div를 동적으로 생성하기 위한 컨테이너 -->
-    </div>
-    <script>
-        // 서버에서 이미 저장된 이미지 파일 목록을 받아옴
-        fetch('/get-image')
-            .then(response => response.json()) // JSON 형식의 응답을 파싱
-            .then(imageNames => {
-                const imageContainer = document.getElementById('image-container');
-                if (imageNames.length > 0) {
-                    imageNames.forEach(imageName => {
-                        const imageDiv = document.createElement('div');
-                        const img = document.createElement('img');
-                        
-                        // 이미지 파일의 경로를 설정
-                        img.src = `/uploads/${imageName}`;
-                        img.alt = 'Uploaded Image';
-                        
-                        imageDiv.appendChild(img);
-                        imageContainer.appendChild(imageDiv);
-                    });
-                } else {
-                    // 이미지 파일이 없는 경우에 대체 텍스트를 표시하거나 다른 처리를 수행할 수 있음
-                    imageContainer.innerHTML = '<p>이미지가 없습니다.</p>';
-                }
-            })
-            .catch(error => {
-                console.error('이미지 가져오기 실패:', error);
-            });
-    </script>
+  <h1>서브 페이지</h1>
+  <h2>업로드된 이미지 파일 목록:</h2>
+  <ul id="imageList">
+  </ul>
+  <h2>업로드된 텍스트 파일 목록:</h2>
+  <ul id="textFileList">
+  </ul>
+  <h2>업로드된 텍스트 파일 내용:</h2>
+  <div id="textFileContent">
+  </div>
+  <a href="/">메인 페이지로 이동</a>
+
+  <script>
+    // 서버로부터 이미지 파일 및 텍스트 파일 목록을 가져와서 목록에 추가하는 JavaScript 코드
+    fetch('/get-image')
+      .then(response => response.json())
+      .then(data => {
+        const imageList = document.getElementById('imageList');
+        const textFileList = document.getElementById('textFileList');
+        data.forEach(filename => {
+          if (filename.endsWith('.jpg')) {
+            const imageBox = document.createElement('div');
+            imageBox.classList.add('image-box');
+
+            const image = document.createElement('img');
+            image.src = `/uploads/${filename}`;
+            imageBox.appendChild(image);
+
+            imageList.appendChild(imageBox);
+          } else if (filename.endsWith('.txt')) {
+            const textFileItem = document.createElement('li');
+            textFileItem.textContent = filename;
+            textFileList.appendChild(textFileItem);
+          }
+        });
+      })
+      .catch(error => console.error(error));
+
+    // 서버로부터 텍스트 파일 내용을 가져와서 표시하는 JavaScript 코드
+    const textFileContent = document.getElementById('textFileContent');
+    textFileList.addEventListener('click', (event) => {
+      const fileName = event.target.textContent;
+      if (fileName.endsWith('.txt')) {
+        fetch(`/uploads/${fileName}`)
+          .then(response => response.text())
+          .then(data => {
+            textFileContent.textContent = data;
+          })
+          .catch(error => console.error(error));
+      }
+    });
+  </script>
 </body>
 </html>

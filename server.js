@@ -18,26 +18,50 @@ app.get('/sub', (req, res) => {
 });
 
 let uploadCounter = 0;
+let uploadCounter2 = 0;
 
 app.post('/upload', (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send('파일이 업로드되지 않았습니다.');
   }
 
-  const uploadedFile = req.files.image;
+  const uploadedImage = req.files.image;
+  const uploadedTextFile = req.files.textFile;
+  const uploadedText = req.body.text; // Get the uploaded text
 
-  const newFileName = `image${++uploadCounter}.jpg`;
+  if (uploadedImage) {
+    const newFileName = `image${++uploadCounter}.jpg`;
+    const uploadPath = path.join(__dirname, 'uploads', newFileName);
+    uploadedImage.mv(uploadPath, (err) => {
+      if (err) {
+        return res.status(500).send('이미지 파일 업로드에 실패했습니다.');
+      }
+    });
+  }
 
-  const uploadPath = path.join(__dirname, 'uploads', newFileName);
+  if (uploadedTextFile) {
+    const textFileName = `text${++uploadCounter}.txt`;
+    const textUploadPath = path.join(__dirname, 'uploads', textFileName);
+    uploadedTextFile.mv(textUploadPath, (err) => {
+      if (err) {
+        return res.status(500).send('텍스트 파일 업로드에 실패했습니다.');
+      }
+    });
+  }
 
-  uploadedFile.mv(uploadPath, (err) => {
-    if (err) {
-      return res.status(500).send('파일 업로드에 실패했습니다.');
-    }
+  if (uploadedText) {
+    const textFileName = `text${++uploadCounter2}.txt`;
+    const textUploadPath = path.join(__dirname, 'uploads', textFileName);
+    fs.writeFile(textUploadPath, uploadedText, (err) => {
+      if (err) {
+        return res.status(500).send('텍스트 파일 변환에 실패했습니다.');
+      }
+    });
+  }
 
-    res.redirect('/sub');
-  });
+  res.redirect('/sub');
 });
+
 
 app.get('/get-image', (req, res) => {
   const filesInUploads = fs.readdirSync(path.join(__dirname, 'uploads'));
