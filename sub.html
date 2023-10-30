@@ -143,6 +143,11 @@
           // 수정: 저장 버튼 생성
           const saveButton = document.createElement('button');
           saveButton.textContent = '저장';
+          saveButton.style.position = 'absolute';
+          saveButton.style.top = "120px"
+          saveButton.style.left = "60px"
+          saveButton.style.width = "45px"
+          saveButton.style.height = "30px"
           saveButton.classList.add('save-button');
           target.parentElement.appendChild(saveButton);
         }
