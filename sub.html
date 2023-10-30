@@ -30,6 +30,12 @@
       bottom: 5px;
       right: 5px;
     }
+    .save-button {
+      /* display: none; */
+      position: absolute;
+      bottom: 5px;
+      right: 45px;
+    }
   </style>
 </head>
 <body>
@@ -40,8 +46,8 @@
   <h2>업로드된 텍스트 파일 내용:</h2>
   <div id="textFileContent">
   </div>
-  <button id="editButton">텍스트 편집</button>
-  <button id="saveButton">저장</button>
+  <!-- <button id="editButton">텍스트 편집</button>
+  <button id="saveButton">저장</button> -->
   <a href="/">메인 페이지로 이동</a>
 
   <script>
@@ -133,35 +139,47 @@
           textContent.contentEditable = true;
           textContent.focus();
           target.style.display = 'none';
-          document.getElementById('saveButton').style.display = 'block';
+
+          // 수정: 저장 버튼 생성
+          const saveButton = document.createElement('button');
+          saveButton.textContent = '저장';
+          saveButton.classList.add('save-button');
+          target.parentElement.appendChild(saveButton);
         }
       }
     });
 
     // 저장 버튼 클릭 시 수정 내용 저장
-    const saveButton = document.getElementById('saveButton');
-    saveButton.addEventListener('click', () => {
-      const textContent = document.querySelector('.text-content');
-      const text = textContent.textContent;
-      const fileName = document.querySelector('.text-file').textContent;
-      fetch('/update-text', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fileName, text }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            console.log('파일이 성공적으로 업데이트되었습니다.');
-          } else {
-            console.error('파일 업데이트 중 오류가 발생했습니다.');
-          }
-        })
-        .catch(error => console.error(error));
-      textContent.contentEditable = false;
-      saveButton.style.display = 'none';
+    combinedFileList.addEventListener('click', (event) => {
+      const target = event.target;
+      if (target.classList.contains('save-button')) {
+        const textContent = target.parentElement.querySelector('.text-content');
+        if (textContent) {
+          const newText = textContent.textContent;
+          const fileName = textContent.parentElement.querySelector('.text-file').textContent;
+
+          // 서버에 수정한 내용을 전송
+          fetch('/update-text', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ fileName, text: newText }),
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                console.log('파일이 성공적으로 업데이트되었습니다.');
+              } else {
+                console.error('파일 업데이트 중 오류가 발생했습니다.');
+              }
+            })
+            .catch(error => console.error(error));
+
+          textContent.contentEditable = false;
+          target.style.display = 'none';
+        }
+      }
     });
   </script>
 </body>

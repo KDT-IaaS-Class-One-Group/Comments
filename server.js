@@ -73,6 +73,7 @@ app.get("/get-image", (req, res) => {
   res.json(filesInUploads);
 });
 
+
 // 텍스트 파일 업데이트를 위한 라우트 추가
 app.post("/update-text", (req, res) => {
   const { fileName, text } = req.body;
