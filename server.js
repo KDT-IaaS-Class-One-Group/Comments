@@ -1,28 +1,32 @@
-const express = require('express');
-const fileUpload = require('express-fileupload');
-const path = require('path');
-const fs = require('fs');
+const express = require("express");
+const fileUpload = require("express-fileupload");
+const path = require("path");
+const fs = require("fs");
+const socketIo = require("socket.io");
 const app = express();
 const port = 3000;
+const http = require("http");
+const server = http.createServer(app);
+const io = socketIo(server);
 
 app.use(fileUpload());
 app.use(express.static(__dirname));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.get('/sub', (req, res) => {
-  res.sendFile(path.join(__dirname, 'sub.html'));
+app.get("/sub", (req, res) => {
+  res.sendFile(path.join(__dirname, "sub.html"));
 });
 
 let uploadCounter = 0;
 let uploadCounter2 = 0;
 
-app.post('/upload', (req, res) => {
+app.post("/upload", (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send('파일이 업로드되지 않았습니다.');
+    return res.status(400).send("파일이 업로드되지 않았습니다.");
   }
 
   const uploadedImage = req.files.image;

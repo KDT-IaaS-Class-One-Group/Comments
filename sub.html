@@ -6,21 +6,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
   <style>
-    .image-box {
+    .file-box {
       display: inline-block;
       margin: 10px;
       border: 1px solid #000;
       padding: 5px;
     }
+
+    .file-box img {
+      width: 5vw; /* 이미지 파일의 가로 크기 */
+      height: 10vh; /* 이미지 파일의 세로 크기 */
+    }
+    ul{
+      list-style: none;
+    }
+    .file-box .text-content {
+      display: none; /* 초기에는 텍스트 숨기기 */
+    }
   </style>
 </head>
 <body>
   <h1>서브 페이지</h1>
-  <h2>업로드된 이미지 파일 목록:</h2>
-  <ul id="imageList">
-  </ul>
-  <h2>업로드된 텍스트 파일 목록:</h2>
-  <ul id="textFileList">
+  <h2>업로드된 이미지 파일 및 텍스트 파일 목록:</h2>
+  <ul id="combinedFileList">
   </ul>
   <h2>업로드된 텍스트 파일 내용:</h2>
   <div id="textFileContent">
@@ -28,42 +36,73 @@
   <a href="/">메인 페이지로 이동</a>
 
   <script>
-    // 서버로부터 이미지 파일 및 텍스트 파일 목록을 가져와서 목록에 추가하는 JavaScript 코드
-    fetch('/get-image')
+   // 서버로부터 이미지 파일 및 텍스트 파일 목록을 가져와서 목록에 추가하는 JavaScript 코드
+   // 서버로부터 이미지 파일 및 텍스트 파일 목록을 가져와서 목록에 추가하는 JavaScript 코드
+   fetch('/get-image')
       .then(response => response.json())
       .then(data => {
-        const imageList = document.getElementById('imageList');
-        const textFileList = document.getElementById('textFileList');
+        const combinedFileList = document.getElementById('combinedFileList');
+
+        // 객체를 사용하여 이미지 파일 및 텍스트 파일을 그룹화합니다.
+        const fileGroups = {};
+
         data.forEach(filename => {
-          if (filename.endsWith('.jpg')) {
-            const imageBox = document.createElement('div');
-            imageBox.classList.add('image-box');
+          const numericPart = filename.match(/\d+/); // 파일 이름에서 숫자 부분을 추출합니다.
+          if (numericPart) {
+            const fileNumber = numericPart[0];
+            if (!fileGroups[fileNumber]) {
+              fileGroups[fileNumber] = { image: null, text: null };
+            }
+            if (filename.endsWith('.jpg')) {
+              fileGroups[fileNumber].image = filename;
+            } else if (filename.endsWith('.txt')) {
+              fileGroups[fileNumber].text = filename;
+            }
+          }
+        });
+
+        // 이미지 파일 및 텍스트 파일을 그룹화된 방식으로 목록에 추가합니다.
+        Object.keys(fileGroups).forEach(fileNumber => {
+          const group = fileGroups[fileNumber];
+          if (group.image && group.text) {
+            const fileListItem = document.createElement('li');
+            const divBox = document.createElement('div');
+            divBox.classList.add('file-box');
 
             const image = document.createElement('img');
-            image.src = `/uploads/${filename}`;
-            imageBox.appendChild(image);
+            image.src = `/uploads/${group.image}`;
+            divBox.appendChild(image);
 
-            imageList.appendChild(imageBox);
-          } else if (filename.endsWith('.txt')) {
-            const textFileItem = document.createElement('li');
-            textFileItem.textContent = filename;
-            textFileList.appendChild(textFileItem);
+            const textFileItem = document.createElement('p');
+            textFileItem.textContent = group.text;
+            textFileItem.classList.add('text-file'); // 클릭 이벤트 대상으로 설정
+            divBox.appendChild(textFileItem);
+
+            // 추가: 텍스트 파일 내용을 비동기로 로드하여 저장
+            fetch(`/uploads/${group.text}`)
+              .then(response => response.text())
+              .then(textContent => {
+                const textContentDiv = document.createElement('div');
+                textContentDiv.classList.add('text-content');
+                textContentDiv.textContent = textContent;
+                divBox.appendChild(textContentDiv);
+              });
+
+            fileListItem.appendChild(divBox);
+            combinedFileList.appendChild(fileListItem);
           }
         });
       })
       .catch(error => console.error(error));
 
-    // 서버로부터 텍스트 파일 내용을 가져와서 표시하는 JavaScript 코드
-    const textFileContent = document.getElementById('textFileContent');
-    textFileList.addEventListener('click', (event) => {
-      const fileName = event.target.textContent;
-      if (fileName.endsWith('.txt')) {
-        fetch(`/uploads/${fileName}`)
-          .then(response => response.text())
-          .then(data => {
-            textFileContent.textContent = data;
-          })
-          .catch(error => console.error(error));
+    // 텍스트 파일 내용 토글 표시
+    combinedFileList.addEventListener('click', (event) => {
+      const target = event.target;
+      if (target.classList.contains('text-file')) {
+        const textContent = target.parentElement.querySelector('.text-content');
+        if (textContent) {
+          textContent.style.display = textContent.style.display === 'none' ? 'block' : 'none';
+        }
       }
     });
   </script>
