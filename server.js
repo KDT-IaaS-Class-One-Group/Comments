@@ -6,8 +6,8 @@ const socketIo = require("socket.io");
 const app = express();
 const port = 5000;
 const http = require("http");
-const io = socketIo(server);
 const server = http.createServer(app);
+const io = socketIo(server);
 
 app.use(fileUpload());
 app.use(express.static(__dirname));
