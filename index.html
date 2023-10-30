@@ -65,6 +65,19 @@
       max-width: 100%;
       display: none;
     }
+
+    /* 실시간 텍스트 미리보기 스타일 */
+    #textPreview {
+      color: black;
+      background-color: lightgray;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    
+    /* 이미지 미리보기 스타일 */
+    #imagePreview {
+      max-width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -77,12 +90,17 @@
     <div class="image-upload-section">
       <label for="image">이미지 업로드:</label>
       <input type="file" name="image" accept="image/*" id="imageInput" onchange="previewImage()">
+      <!-- 이미지 파일명을 표시할 요소 추가 -->
+      <p id="selectedImageName"></p>
+      <!-- 이미지를 표시할 요소 추가 -->
+      <img id="imagePreview" style="display: none;">
     </div>
     <div class="text-upload-section">
       <!-- <label for="textFile">텍스트 파일 업로드:</label> -->
       <!-- <input type="file" name="textFile" accept=".txt"> -->
       <label for="text">텍스트 입력:</label>
-      <textarea name="text" rows="4" cols="50"></textarea><br>
+      <textarea name="text" rows="4" cols="50" id="textInput" oninput="previewText(this.value)"></textarea><br>
+      <div id="textPreview" style="display: none;"></div>
       <input type="submit" value="파일 업로드">
     </div>
   </form>
@@ -106,12 +124,17 @@
           previewImage.style.display = 'block'; // 미리보기를 보이게 함
           previewImage.src = e.target.result;
           defaultBanner.style.display = 'none'; // 기본 배너 이미지 숨김
+
+          // 이미지 파일명을 표시 (선택한 파일의 이름)
+          const selectedImageName = imageInput.files[0].name;
+          document.getElementById('selectedImageName').innerText = `선택한 이미지: ${selectedImageName}`;
         };
 
         reader.readAsDataURL(imageInput.files[0]);
       } else {
         previewImage.style.display = 'none';
         defaultBanner.style.display = 'block'; // 기본 배너 이미지 표시
+        document.getElementById('selectedImageName').innerText = ''; // 이미지 파일명 초기화
       }
     }
 
@@ -119,6 +142,17 @@
     function selectImage() {
       const imageInput = document.getElementById('imageInput');
       imageInput.click(); // 파일 선택 버튼을 자동으로 클릭
+    }
+
+    // 텍스트 입력을 실시간으로 미리보기에 업데이트하는 JavaScript 코드
+    function previewText(text) {
+      const textPreview = document.getElementById('textPreview');
+      if (text) {
+        textPreview.style.display = 'block';
+        textPreview.innerText = text;
+      } else {
+        textPreview.style.display = 'none';
+      }
     }
   </script>
 </body>
