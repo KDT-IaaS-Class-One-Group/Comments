@@ -4,7 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const socketIo = require("socket.io");
 const app = express();
-const port = 3000;
+const port = 5000;
 const http = require("http");
 const server = http.createServer(app);
 const io = socketIo(server);
@@ -72,6 +72,34 @@ app.get('/get-image', (req, res) => {
   res.json(filesInUploads); // 이미지 파일 이름 목록을 JSON 형식으로 전달
 });
 
+app.get('/uploads/:fileName', (req, res) => {
+  const fileName = req.params.fileName;
+  // 서버에서 파일 내용을 읽어와 클라이언트에 반환
+  const filePath = __dirname + '/uploads/' + fileName;
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ success: false });
+    } else {
+      res.send(data);
+    }
+  });
+});
+
+app.post('/update-text', (req, res) => {
+  const { fileName, text } = req.body;
+  const filePath = __dirname + '/uploads/' + fileName;
+  fs.writeFile(filePath, text, 'utf8', (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ success: false });
+    } else {
+      res.json({ success: true });
+    }
+  });
+});
+
+
 app.listen(port, () => {
-  console.log(`서버가 ${port} 포트에서 실행 중입니다.`);
+  console.log(`Server is running on http://localhost:${port}`);
 });

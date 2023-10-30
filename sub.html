@@ -11,6 +11,7 @@
       margin: 10px;
       border: 1px solid #000;
       padding: 5px;
+      position: relative;
     }
 
     .file-box img {
@@ -23,6 +24,12 @@
     .file-box .text-content {
       display: none; /* 초기에는 텍스트 숨기기 */
     }
+    .edit-button {
+      display: none; /* 초기에는 버튼 숨기기 */
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+    }
   </style>
 </head>
 <body>
@@ -33,6 +40,8 @@
   <h2>업로드된 텍스트 파일 내용:</h2>
   <div id="textFileContent">
   </div>
+  <button id="editButton">텍스트 편집</button>
+  <button id="saveButton">저장</button>
   <a href="/">메인 페이지로 이동</a>
 
   <script>
@@ -102,8 +111,46 @@
         const textContent = target.parentElement.querySelector('.text-content');
         if (textContent) {
           textContent.style.display = textContent.style.display === 'none' ? 'block' : 'none';
+          document.getElementById('editButton').style.display = textContent.style.display === 'block' ? 'inline' : 'none';
         }
       }
+    });
+     // 추가: 텍스트 편집 버튼 클릭 시 내용 수정 가능
+     const editButton = document.getElementById('editButton');
+    const textFileContent = document.getElementById('textFileContent');
+
+    editButton.addEventListener('click', () => {
+      const textContent = document.querySelector('.text-content');
+      textContent.contentEditable = true;
+      editButton.textContent = '저장';
+      editButton.addEventListener('click', () => {
+        textContent.contentEditable = false;
+        editButton.textContent = '텍스트 편집';
+        // 서버에 수정된 내용을 전송하려면 추가로 필요한 코드가 있습니다.
+      });
+    });
+
+    const saveButton = document.getElementById('saveButton');
+    const textContent = document.getElementById('textContent');
+    saveButton.addEventListener('click', () => {
+      const text = textContent.value;
+      const fileName = document.querySelector('.text-file').textContent;
+      fetch('/update-text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileName, text }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            console.log('파일이 성공적으로 업데이트되었습니다.');
+          } else {
+            console.error('파일 업데이트 중 오류가 발생했습니다.');
+          }
+        })
+        .catch(error => console.error(error));
     });
   </script>
 </body>
