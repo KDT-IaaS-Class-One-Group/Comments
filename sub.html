@@ -21,7 +21,7 @@
     ul{
       list-style: none;
     }
-    .file-box .text-content {
+    .text-content {
       display: none; /* 초기에는 텍스트 숨기기 */
     }
     .edit-button {
@@ -45,8 +45,8 @@
   <a href="/">메인 페이지로 이동</a>
 
   <script>
-   // 서버로부터 이미지 파일 및 텍스트 파일 목록을 가져와서 목록에 추가하는 JavaScript 코드
-   fetch('/get-image')
+    // 서버로부터 이미지 파일 및 텍스트 파일 목록을 가져와서 목록에 추가하는 JavaScript 코드
+    fetch('/get-image')
       .then(response => response.json())
       .then(data => {
         const combinedFileList = document.getElementById('combinedFileList');
@@ -94,6 +94,12 @@
                 textContentDiv.classList.add('text-content');
                 textContentDiv.textContent = textContent;
                 divBox.appendChild(textContentDiv);
+
+                // 추가: 텍스트 편집 버튼
+                const editButton = document.createElement('button');
+                editButton.textContent = '텍스트 편집';
+                editButton.classList.add('edit-button');
+                divBox.appendChild(editButton);
               });
 
             fileListItem.appendChild(divBox);
@@ -107,22 +113,29 @@
     combinedFileList.addEventListener('click', (event) => {
       const target = event.target;
       if (target.classList.contains('text-file')) {
-        const textContent = target.parentElement.querySelector('.text-content');
+        const textContent = target.nextElementSibling;
         if (textContent) {
           textContent.style.display = textContent.style.display === 'none' ? 'block' : 'none';
-          document.getElementById('editButton').style.display = textContent.style.display === 'block' ? 'inline' : 'none';
+          const editButton = textContent.nextElementSibling;
+          if (editButton) {
+            editButton.style.display = textContent.style.display === 'block' ? 'inline' : 'none';
+          }
         }
       }
     });
 
     // 텍스트 편집 버튼 클릭 시 내용 수정 가능
-    const editButton = document.getElementById('editButton');
-    editButton.addEventListener('click', () => {
-      const textContent = document.querySelector('.text-content');
-      textContent.contentEditable = true;
-      textContent.focus();
-      editButton.style.display = 'none';
-      document.getElementById('saveButton').style.display = 'block';
+    combinedFileList.addEventListener('click', (event) => {
+      const target = event.target;
+      if (target.classList.contains('edit-button')) {
+        const textContent = target.previousElementSibling;
+        if (textContent) {
+          textContent.contentEditable = true;
+          textContent.focus();
+          target.style.display = 'none';
+          document.getElementById('saveButton').style.display = 'block';
+        }
+      }
     });
 
     // 저장 버튼 클릭 시 수정 내용 저장
@@ -148,7 +161,6 @@
         })
         .catch(error => console.error(error));
       textContent.contentEditable = false;
-      editButton.style.display = 'block';
       saveButton.style.display = 'none';
     });
   </script>
