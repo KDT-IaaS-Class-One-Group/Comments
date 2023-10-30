@@ -36,26 +36,24 @@
   <h1>서브 페이지</h1>
   <h2>업로드된 이미지 파일 및 텍스트 파일 목록:</h2>
   <ul id="combinedFileList">
-    <!-- 이미지 및 텍스트 파일 목록이 여기에 표시됩니다. -->
   </ul>
   <h2>업로드된 텍스트 파일 내용:</h2>
   <div id="textFileContent">
-    <!-- 텍스트 파일 내용이 여기에 표시됩니다. -->
   </div>
   <button id="editButton">텍스트 편집</button>
   <button id="saveButton">저장</button>
   <a href="/">메인 페이지로 이동</a>
 
   <script>
-    // 서버로부터 이미지 파일 및 텍스트 파일 목록을 가져와서 목록에 추가하는 JavaScript 코드
-    fetch('/get-image')
+   // 서버로부터 이미지 파일 및 텍스트 파일 목록을 가져와서 목록에 추가하는 JavaScript 코드
+   fetch('/get-image')
       .then(response => response.json())
       .then(data => {
         const combinedFileList = document.getElementById('combinedFileList');
-  
+
         // 객체를 사용하여 이미지 파일 및 텍스트 파일을 그룹화합니다.
         const fileGroups = {};
-  
+
         data.forEach(filename => {
           const numericPart = filename.match(/\d+/); // 파일 이름에서 숫자 부분을 추출합니다.
           if (numericPart) {
@@ -70,7 +68,7 @@
             }
           }
         });
-  
+
         // 이미지 파일 및 텍스트 파일을 그룹화된 방식으로 목록에 추가합니다.
         Object.keys(fileGroups).forEach(fileNumber => {
           const group = fileGroups[fileNumber];
@@ -78,16 +76,16 @@
             const fileListItem = document.createElement('li');
             const divBox = document.createElement('div');
             divBox.classList.add('file-box');
-  
+
             const image = document.createElement('img');
             image.src = `/uploads/${group.image}`;
             divBox.appendChild(image);
-  
+
             const textFileItem = document.createElement('p');
             textFileItem.textContent = group.text;
             textFileItem.classList.add('text-file'); // 클릭 이벤트 대상으로 설정
             divBox.appendChild(textFileItem);
-  
+
             // 추가: 텍스트 파일 내용을 비동기로 로드하여 저장
             fetch(`/uploads/${group.text}`)
               .then(response => response.text())
@@ -95,17 +93,16 @@
                 const textContentDiv = document.createElement('div');
                 textContentDiv.classList.add('text-content');
                 textContentDiv.textContent = textContent;
-                textContentDiv.contentEditable = false; // 기본적으로 편집 불가능 상태로 설정
                 divBox.appendChild(textContentDiv);
               });
-  
+
             fileListItem.appendChild(divBox);
             combinedFileList.appendChild(fileListItem);
           }
         });
       })
       .catch(error => console.error(error));
-  
+
     // 텍스트 파일 내용 토글 표시
     combinedFileList.addEventListener('click', (event) => {
       const target = event.target;
@@ -117,46 +114,43 @@
         }
       }
     });
-  
-    // 추가: 텍스트 편집 버튼 클릭 시 내용 수정 가능
+
+    // 텍스트 편집 버튼 클릭 시 내용 수정 가능
     const editButton = document.getElementById('editButton');
-  
     editButton.addEventListener('click', () => {
       const textContent = document.querySelector('.text-content');
       textContent.contentEditable = true;
-      editButton.textContent = '저장';
-      editButton.addEventListener('click', () => {
-        textContent.contentEditable = false;
-        editButton.textContent = '텍스트 편집';
-        const updatedText = textContent.textContent;
-  
-        // 서버로 수정된 텍스트 내용을 전송
-        const textFileName = document.querySelector('.text-file').textContent;
-        fetch('/update-text', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            fileName: textFileName,
-            text: updatedText,
-          }),
-        })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              console.log('파일이 성공적으로 업데이트되었습니다.');
-            } else {
-              console.error('파일 업데이트 중 오류가 발생했습니다.');
-            }
-          })
-          .catch(error => console.error(error));
-      });
+      textContent.focus();
+      editButton.style.display = 'none';
+      document.getElementById('saveButton').style.display = 'block';
     });
-    
+
+    // 저장 버튼 클릭 시 수정 내용 저장
+    const saveButton = document.getElementById('saveButton');
+    saveButton.addEventListener('click', () => {
+      const textContent = document.querySelector('.text-content');
+      const text = textContent.textContent;
+      const fileName = document.querySelector('.text-file').textContent;
+      fetch('/update-text', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileName, text }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            console.log('파일이 성공적으로 업데이트되었습니다.');
+          } else {
+            console.error('파일 업데이트 중 오류가 발생했습니다.');
+          }
+        })
+        .catch(error => console.error(error));
+      textContent.contentEditable = false;
+      editButton.style.display = 'block';
+      saveButton.style.display = 'none';
+    });
   </script>
 </body>
 </html>
-
-
-
