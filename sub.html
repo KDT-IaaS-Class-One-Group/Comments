@@ -149,7 +149,7 @@
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ fileName, text }),
+        body: JSON.stringify({ fileName, text }), // fileName 및 text를 JSON으로 전송
       })
         .then(response => response.json())
         .then(data => {
