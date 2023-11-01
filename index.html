@@ -81,10 +81,6 @@
   </style>
 </head>
 <body>
-  <div class="banner" onclick="selectImage()">
-    배너 영역 클릭하여 이미지 선택
-    <img id="defaultBanner" src="banner.webp" alt="기본 배너">
-  </div>
   <h1>파일 업로드 페이지</h1>
   <form action="/upload" method="POST" enctype="multipart/form-data">
     <div class="image-upload-section">
@@ -138,11 +134,6 @@
       }
     }
 
-    // 배너를 클릭하여 이미지 선택하는 JavaScript 코드
-    function selectImage() {
-      const imageInput = document.getElementById('imageInput');
-      imageInput.click(); // 파일 선택 버튼을 자동으로 클릭
-    }
 
     // 텍스트 입력을 실시간으로 미리보기에 업데이트하는 JavaScript 코드
     function previewText(text) {

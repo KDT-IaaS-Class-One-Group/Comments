@@ -23,8 +23,7 @@ app.get("/sub", (req, res) => {
   res.sendFile(path.join(__dirname, "sub.html"));
 });
 
-let uploadCounter = 0;
-let uploadCounter2 = 0;
+const uploadCounter = { image: 0, text: 0 };
 
 app.post("/upload", (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -36,7 +35,7 @@ app.post("/upload", (req, res) => {
   const uploadedText = req.body.text;
 
   if (uploadedImage) {
-    const newFileName = `image${++uploadCounter}.jpg`;
+    const newFileName = `image${++uploadCounter.image}.jpg`;
     const uploadPath = path.join(__dirname, "uploads", newFileName);
     uploadedImage.mv(uploadPath, (err) => {
       if (err) {
@@ -46,8 +45,8 @@ app.post("/upload", (req, res) => {
   }
 
   if (uploadedTextFile) {
-    const textFileName = `text${++uploadCounter}.txt`;
-    const textUploadPath = path.join(__dirname, "uploads", textFileName);
+    const newFileName = `text${++uploadCounter.text}.txt`;
+    const textUploadPath = path.join(__dirname, "uploads", newFileName);
     uploadedTextFile.mv(textUploadPath, (err) => {
       if (err) {
         return res.status(500).send("텍스트 파일 업로드에 실패했습니다.");
@@ -56,9 +55,9 @@ app.post("/upload", (req, res) => {
   }
 
   if (uploadedText) {
-    const textFileName = `text${++uploadCounter2}.txt`;
-    const textUploadPath = path.join(__dirname, "uploads", textFileName);
-    fs.writeFile(textUploadPath, uploadedText, (err) => {
+    const newFileName = `text${++uploadCounter.text}.txt`;
+    const textUploadPath = path.join(__dirname, "uploads", newFileName);
+    fs.writeFile(textUploadPath, uploadedText, "utf8", (err) => {
       if (err) {
         return res.status(500).send("텍스트 파일 변환에 실패했습니다.");
       }
@@ -73,7 +72,6 @@ app.get("/get-image", (req, res) => {
   res.json(filesInUploads);
 });
 
-
 // 텍스트 파일 업데이트를 위한 라우트 추가
 app.post("/update-text", (req, res) => {
   const { fileName, text } = req.body;
@@ -81,7 +79,7 @@ app.post("/update-text", (req, res) => {
   if (fileName && text) {
     const textFilePath = path.join(__dirname, "uploads", fileName);
 
-    fs.writeFile(textFilePath, text, (err) => {
+    fs.writeFile(textFilePath, text, "utf8", (err) => {
       if (err) {
         return res.json({ success: false, message: "텍스트 파일 업데이트에 실패했습니다." });
       }
