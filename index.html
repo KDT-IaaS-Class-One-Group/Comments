@@ -89,7 +89,7 @@
       <!-- 이미지 파일명을 표시할 요소 추가 -->
       <p id="selectedImageName"></p>
       <!-- 이미지를 표시할 요소 추가 -->
-      <img id="imagePreview" style="display: none;">
+      <!-- <img id="imagePreview" style="display: none;"> -->
     </div>
     <div class="text-upload-section">
       <!-- <label for="textFile">텍스트 파일 업로드:</label> -->
@@ -117,7 +117,7 @@
         const reader = new FileReader();
 
         reader.onload = function(e) {
-          previewImage.style.display = 'block'; // 미리보기를 보이게 함
+          // previewImage.style.display = 'block'; // 미리보기를 보이게 함
           previewImage.src = e.target.result;
 
           // 이미지 파일명을 표시 (선택한 파일의 이름)
@@ -127,7 +127,7 @@
 
         reader.readAsDataURL(imageInput.files[0]);
       } else {
-        previewImage.style.display = 'none';
+        // previewImage.style.display = 'none';
         document.getElementById('selectedImageName').innerText = ''; // 이미지 파일명 초기화
       }
     }
