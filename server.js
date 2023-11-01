@@ -23,7 +23,7 @@ app.get("/sub", (req, res) => {
   res.sendFile(path.join(__dirname, "sub.html"));
 });
 
-const uploadCounter = { image: 0, text: 0 };
+const uploadCounter = {image: 0, text: 0};
 
 app.post("/upload", (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -31,7 +31,6 @@ app.post("/upload", (req, res) => {
   }
 
   const uploadedImage = req.files.image;
-  const uploadedTextFile = req.files.textFile;
   const uploadedText = req.body.text;
 
   if (uploadedImage) {
@@ -40,16 +39,6 @@ app.post("/upload", (req, res) => {
     uploadedImage.mv(uploadPath, (err) => {
       if (err) {
         return res.status(500).send("이미지 파일 업로드에 실패했습니다.");
-      }
-    });
-  }
-
-  if (uploadedTextFile) {
-    const newFileName = `text${++uploadCounter.text}.txt`;
-    const textUploadPath = path.join(__dirname, "uploads", newFileName);
-    uploadedTextFile.mv(textUploadPath, (err) => {
-      if (err) {
-        return res.status(500).send("텍스트 파일 업로드에 실패했습니다.");
       }
     });
   }
@@ -74,19 +63,19 @@ app.get("/get-image", (req, res) => {
 
 // 텍스트 파일 업데이트를 위한 라우트 추가
 app.post("/update-text", (req, res) => {
-  const { fileName, text } = req.body;
+  const {fileName, text} = req.body;
 
   if (fileName && text) {
     const textFilePath = path.join(__dirname, "uploads", fileName);
 
     fs.writeFile(textFilePath, text, "utf8", (err) => {
       if (err) {
-        return res.json({ success: false, message: "텍스트 파일 업데이트에 실패했습니다." });
+        return res.json({success: false, message: "텍스트 파일 업데이트에 실패했습니다."});
       }
-      res.json({ success: true, message: "텍스트 파일이 성공적으로 업데이트되었습니다." });
+      res.json({success: true, message: "텍스트 파일이 성공적으로 업데이트되었습니다."});
     });
   } else {
-    res.json({ success: false, message: "요청에 필요한 데이터가 누락되었습니다." });
+    res.json({success: false, message: "요청에 필요한 데이터가 누락되었습니다."});
   }
 });
 

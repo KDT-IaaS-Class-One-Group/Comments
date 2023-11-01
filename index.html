@@ -124,9 +124,8 @@
         const reader = new FileReader();
 
         reader.onload = function(e) {
-          previewImage.style.display = 'block'; // 미리보기를 보이게 함
+          // previewImage.style.display = 'block'; // 미리보기를 보이게 함
           previewImage.src = e.target.result;
-          // defaultBanner.style.display = 'none'; // 기본 배너 이미지 숨김
 
           // 이미지 파일명을 표시 (선택한 파일의 이름)
           const selectedImageName = imageInput.files[0].name;
@@ -135,8 +134,7 @@
 
         reader.readAsDataURL(imageInput.files[0]);
       } else {
-        previewImage.style.display = 'none';
-        defaultBanner.style.display = 'block'; // 기본 배너 이미지 표시
+        // previewImage.style.display = 'none';
         document.getElementById('selectedImageName').innerText = ''; // 이미지 파일명 초기화
       }
     }
