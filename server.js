@@ -25,6 +25,19 @@ app.get("/sub", (req, res) => {
 
 const uploadCounter = {image: 0, text: 0};
 
+const folderName = 'uploads';
+
+// 폴더가 이미 존재하는지 확인
+if (!fs.existsSync(folderName)) {
+  // 폴더가 존재하지 않으면 폴더를 만듭니다.
+  fs.mkdirSync(folderName);
+  console.log(`'${folderName}' 폴더가 생성되었습니다.`);
+} else {
+  console.log(`'${folderName}' 폴더는 이미 존재합니다.`);
+}
+
+
+
 app.post("/upload", (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) {
     return res.status(400).send("파일이 업로드되지 않았습니다.");
